@@ -71,7 +71,7 @@ function BookingDialog({ ref }: { ref: React.Ref<HTMLDialogElement> }) {
       onClick={(e) => {
         if (e.target === e.currentTarget) e.currentTarget.close();
       }}
-      className="booking-sheet text-ink"
+      className="sheet-dialog text-ink"
     >
       <div className="max-h-[88dvh] overflow-y-auto p-5 sm:p-7">
         <div className="flex items-start justify-between gap-4">

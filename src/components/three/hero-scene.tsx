@@ -15,6 +15,8 @@ type SceneProps = {
   active: boolean;
   dragRef: RefObject<DragState>;
   onReady: () => void;
+  /** Small card version: lighter sparkles and no lift on scroll. */
+  compact?: boolean;
 };
 
 /*
@@ -130,7 +132,7 @@ const DARK: Palette = {
   sparkle: "#8ff0e6",
 };
 
-export default function HeroScene({ dark, reduced, active, dragRef, onReady }: SceneProps) {
+export default function HeroScene({ dark, reduced, active, dragRef, onReady, compact = false }: SceneProps) {
   const [dpr, setDpr] = useState(1.5);
   const palette = dark ? DARK : LIGHT;
 
@@ -138,7 +140,7 @@ export default function HeroScene({ dark, reduced, active, dragRef, onReady }: S
     <Canvas
       frameloop={active ? "always" : "never"}
       dpr={[1, dpr]}
-      camera={{ position: [0, 0, 6.2], fov: 32 }}
+      camera={{ position: [0, 0, compact ? 5.3 : 6.2], fov: 32 }}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       style={{ touchAction: "pan-y" }}
       onCreated={onReady}
@@ -147,7 +149,7 @@ export default function HeroScene({ dark, reduced, active, dragRef, onReady }: S
       <ambientLight intensity={dark ? 0.35 : 0.6} />
       <directionalLight position={[3, 4, 5]} intensity={dark ? 1.3 : 1.7} />
       <Studio dark={dark} />
-      <Rig dragRef={dragRef} reduced={reduced}>
+      <Rig dragRef={dragRef} reduced={reduced} lift={!compact}>
         <Float speed={reduced ? 0 : 1.2} rotationIntensity={0.15} floatIntensity={reduced ? 0 : 0.4}>
           <group rotation={[0.04, 0.3, 0.16]} scale={1.3} position={[0.08, 0.2, 0]}>
             <GlassKidney palette={palette} reduced={reduced} />
@@ -156,8 +158,8 @@ export default function HeroScene({ dark, reduced, active, dragRef, onReady }: S
         </Float>
       </Rig>
       <Sparkles
-        count={70}
-        scale={[4.2, 4.2, 2.2]}
+        count={compact ? 28 : 70}
+        scale={compact ? [3, 3.4, 1.6] : [4.2, 4.2, 2.2]}
         size={dark ? 2.2 : 2.8}
         speed={reduced ? 0 : 0.25}
         opacity={dark ? 0.6 : 0.45}
@@ -171,10 +173,12 @@ export default function HeroScene({ dark, reduced, active, dragRef, onReady }: S
 function Rig({
   dragRef,
   reduced,
+  lift,
   children,
 }: {
   dragRef: RefObject<DragState>;
   reduced: boolean;
+  lift: boolean;
   children: React.ReactNode;
 }) {
   const group = useRef<THREE.Group>(null);
@@ -193,7 +197,7 @@ function Rig({
 
     g.rotation.y = THREE.MathUtils.damp(g.rotation.y, yaw, 5, dt);
     g.rotation.x = THREE.MathUtils.damp(g.rotation.x, pitch, 5, dt);
-    g.position.y = THREE.MathUtils.damp(g.position.y, scroll * 1.1, 5, dt);
+    if (lift) g.position.y = THREE.MathUtils.damp(g.position.y, scroll * 1.1, 5, dt);
   });
 
   return <group ref={group}>{children}</group>;

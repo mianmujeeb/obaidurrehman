@@ -5,6 +5,7 @@ import { allServices } from "@/lib/doctor";
 import { treatments, type SceneKind } from "@/lib/treatments";
 import { cn } from "@/lib/utils";
 import { Reveal, TiltCard } from "../motion";
+import { TreatmentArt } from "../treatment-art";
 import { TreatmentIcon } from "../treatment-icon";
 
 // 12-col bento on desktop, 2-col on tablets. Exactly six cells, no gaps.
@@ -58,17 +59,30 @@ export function Treatments() {
                         className="absolute inset-0 bg-[radial-gradient(80%_60%_at_85%_10%,rgb(255_255_255/0.18),transparent_60%),repeating-radial-gradient(circle_at_85%_10%,rgb(255_255_255/0.07)_0_1px,transparent_1px_22px)]"
                       />
                     )}
-                    <ViewTransition name={`icon-${t.slug}`} share="morph" default="none">
-                      <span
-                        className={cn(
-                          "relative grid size-12 place-items-center rounded-full",
-                          feature ? "bg-accent-ink/15" : "bg-accent-soft text-accent",
-                        )}
-                      >
-                        <TreatmentIcon kind={t.scene} size={24} />
-                      </span>
-                    </ViewTransition>
-                    <div className="relative mt-10">
+                    <div className="relative flex items-start justify-between gap-4">
+                      <ViewTransition name={`icon-${t.slug}`} share="morph" default="none">
+                        <span
+                          className={cn(
+                            "grid size-12 shrink-0 place-items-center rounded-full",
+                            feature ? "bg-accent-ink/15" : "bg-accent-soft text-accent",
+                          )}
+                        >
+                          <TreatmentIcon kind={t.scene} size={24} />
+                        </span>
+                      </ViewTransition>
+                      {!feature && (
+                        <TreatmentArt kind={t.scene} className="-mr-3 -mt-3 h-32 w-52 text-accent sm:h-36 sm:w-60 lg:h-40 lg:w-64" />
+                      )}
+                    </div>
+                    {/* The featured card plays on its own while on screen. */}
+                    {feature && (
+                      <TreatmentArt
+                        kind={t.scene}
+                        autoplay
+                        className="relative my-4 h-48 sm:h-60 lg:h-auto lg:min-h-52 lg:flex-1"
+                      />
+                    )}
+                    <div className={cn("relative", feature ? "mt-2" : "mt-6")}>
                       <ViewTransition name={`title-${t.slug}`} share="morph" default="none">
                         <h3
                           className={cn(
