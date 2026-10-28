@@ -31,10 +31,12 @@ const highlights = [
 
 const rise = (i: number) => ({ "--i": i }) as React.CSSProperties;
 
+// A full-screen section on desktop. The photo can only grow as wide as its
+// column, so on tall screens the composition is centred in the extra space.
 export function Hero() {
   return (
-    <section id="top" className="relative overflow-hidden pt-16 md:pt-[72px]">
-      <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-6 px-4 sm:gap-10 md:px-8 lg:min-h-[min(calc(100dvh-72px),50rem)] lg:grid-cols-12 lg:gap-8">
+    <section id="top" className="relative overflow-hidden pt-16 md:pt-[72px] lg:flex lg:min-h-dvh lg:flex-col lg:justify-center">
+      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-6 px-4 sm:gap-10 md:px-8 lg:grid-cols-12 lg:gap-8">
         <div className="relative z-10 pt-6 sm:pt-10 lg:col-span-6 lg:py-12">
           <Link
             href="/reviews#reviews"
