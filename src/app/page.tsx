@@ -59,7 +59,7 @@ const jsonLd = {
     })),
     ...organs.flatMap((o) => o.procedures.map((p) => ({ "@type": "MedicalProcedure", name: p }))),
   ],
-  sameAs: [links.oladoc, links.marham],
+  sameAs: [links.oladoc, links.marham, links.google],
 };
 
 const slide = {
@@ -89,7 +89,7 @@ export default function Home() {
             <Clinics more />
           </FlowSection>
           <FlowSection>
-            <Reviews more />
+            <Reviews />
           </FlowSection>
           <FlowSection>
             <Faq more />

@@ -21,6 +21,18 @@ export function usePrefersDark() {
   );
 }
 
+const noHoverQuery = "(hover: none)";
+const subscribeNoHover = subscribeMedia(noHoverQuery);
+
+/** True on touch-first devices, where nothing can be hovered. */
+export function useNoHover() {
+  return useSyncExternalStore(
+    subscribeNoHover,
+    () => window.matchMedia(noHoverQuery).matches,
+    () => false,
+  );
+}
+
 function subscribeMinute(onChange: () => void) {
   const id = window.setInterval(onChange, 30_000);
   return () => window.clearInterval(id);

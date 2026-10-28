@@ -6,7 +6,7 @@ import { motion, useMotionValue, useMotionValueEvent, useScroll, useTransform } 
 import { ArrowLeftIcon, ArrowRightIcon } from "@phosphor-icons/react";
 import type { SceneKind } from "@/lib/treatments";
 import { cn } from "@/lib/utils";
-import { TreatmentIcon } from "./treatment-icon";
+import { TreatmentArt } from "./treatment-art";
 
 export type RailItem = {
   slug: string;
@@ -46,7 +46,7 @@ export function TreatmentRail({ items }: { items: RailItem[] }) {
       const cs = getComputedStyle(viewport);
       const inner = viewport.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
       // Too short a screen to hold the heading and a card: keep the swipeable row.
-      const fits = window.innerHeight >= 620;
+      const fits = window.innerHeight >= 660;
       const d = fits ? Math.max(0, Math.round(track.offsetWidth - inner)) : 0;
       travel.set(d);
       setDistance(d);
@@ -81,43 +81,23 @@ export function TreatmentRail({ items }: { items: RailItem[] }) {
       <div
         className={cn(
           pinned
-            ? "sticky top-0 flex h-svh flex-col justify-center overflow-x-clip pb-6 pt-16 md:pb-8 md:pt-[72px]"
+            ? // Phones keep clear of the Call / Book bar fixed along the bottom.
+              "sticky top-0 flex h-svh flex-col justify-center overflow-x-clip pb-[calc(env(safe-area-inset-bottom)+5rem)] pt-16 md:pb-8 md:pt-[72px]"
             : "py-20 md:py-28",
         )}
       >
         <div className="mx-auto w-full max-w-7xl px-4 md:px-8">
-          <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
-            <div>
-              <h2 id="other-treatments" className="text-3xl font-semibold leading-[1.1] tracking-tight md:text-5xl">
-                Other treatments
-              </h2>
-              <p className="mt-3 max-w-[48ch] leading-relaxed text-muted">
-                Each one has its own step-by-step guide with a 3D walkthrough.
-              </p>
-            </div>
-            {pinned && (
-              <div className="flex items-center gap-2">
-                <p className="mr-2 text-sm tabular-nums text-muted" aria-live="polite">
-                  <span className="font-semibold text-ink">{pad(active + 1)}</span> / {pad(items.length)}
-                </p>
-                <RailButton label="Previous treatment" disabled={active === 0} onClick={() => goTo(active - 1)}>
-                  <ArrowLeftIcon size={16} weight="bold" aria-hidden />
-                </RailButton>
-                <RailButton
-                  label="Next treatment"
-                  disabled={active === items.length - 1}
-                  onClick={() => goTo(active + 1)}
-                >
-                  <ArrowRightIcon size={16} weight="bold" aria-hidden />
-                </RailButton>
-              </div>
-            )}
-          </div>
+          <h2 id="other-treatments" className="text-3xl font-semibold leading-[1.1] tracking-tight md:text-5xl">
+            Other treatments
+          </h2>
+          <p className="mt-3 hidden max-w-[48ch] leading-relaxed text-muted sm:block">
+            Each one has its own step-by-step guide with a 3D walkthrough.
+          </p>
 
           <div
             ref={viewportRef}
             className={cn(
-              "mt-8 md:mt-10",
+              "mt-6 md:mt-10",
               !pinned && "-mx-4 snap-x snap-mandatory overflow-x-auto px-4 [scrollbar-width:none] md:-mx-8 md:px-8",
             )}
           >
@@ -131,15 +111,27 @@ export function TreatmentRail({ items }: { items: RailItem[] }) {
                     if ((e.target as HTMLElement).matches(":focus-visible")) goTo(i);
                   }}
                 >
-                  <Card item={o} index={i} />
+                  <Card item={o} index={i} live={pinned && i === active} />
                 </li>
               ))}
             </motion.ul>
           </div>
 
           {pinned && (
-            <div aria-hidden className="mt-8 h-1 overflow-hidden rounded-full bg-line md:mt-10">
-              <motion.div style={{ scaleX: scrollYProgress }} className="h-full origin-left rounded-full bg-accent" />
+            // Controls on the left so they never sit under the back-to-top button.
+            <div className="mt-6 flex items-center gap-2 md:mt-8">
+              <RailButton label="Previous treatment" disabled={active === 0} onClick={() => goTo(active - 1)}>
+                <ArrowLeftIcon size={16} weight="bold" aria-hidden />
+              </RailButton>
+              <RailButton label="Next treatment" disabled={active === items.length - 1} onClick={() => goTo(active + 1)}>
+                <ArrowRightIcon size={16} weight="bold" aria-hidden />
+              </RailButton>
+              <p className="mx-2 text-sm tabular-nums text-muted" aria-live="polite">
+                <span className="font-semibold text-ink">{pad(active + 1)}</span> / {pad(items.length)}
+              </p>
+              <div aria-hidden className="h-1 flex-1 overflow-hidden rounded-full bg-line">
+                <motion.div style={{ scaleX: scrollYProgress }} className="h-full origin-left rounded-full bg-accent" />
+              </div>
             </div>
           )}
         </div>
@@ -148,28 +140,21 @@ export function TreatmentRail({ items }: { items: RailItem[] }) {
   );
 }
 
-function Card({ item, index }: { item: RailItem; index: number }) {
+function Card({ item, index, live }: { item: RailItem; index: number; live: boolean }) {
   return (
     <Link
       href={`/treatments/${item.slug}`}
       transitionTypes={["nav-forward"]}
-      className="group relative flex h-full min-h-[22rem] flex-col overflow-hidden rounded-3xl border border-line bg-surface p-6 transition-colors duration-300 hover:border-accent sm:min-h-[25rem] sm:p-8"
+      className="group flex h-full flex-col rounded-3xl border border-line bg-surface p-5 transition-colors duration-300 hover:border-accent sm:p-7"
     >
-      <span
-        aria-hidden
-        className="pointer-events-none absolute -bottom-12 -right-12 text-accent opacity-[0.06] transition-transform duration-700 group-hover:-rotate-6 group-hover:scale-110"
-      >
-        <TreatmentIcon kind={item.scene} size={240} />
+      {/* Illustration plate: plays for the current card, and on hover or focus. */}
+      <span className="relative block h-24 overflow-hidden rounded-2xl bg-accent-soft/60 text-accent sm:h-36 lg:h-40">
+        <TreatmentArt kind={item.scene} live={live} className="absolute inset-x-4 inset-y-2" />
+        <span className="absolute right-4 top-3 text-sm font-medium tabular-nums text-muted">{pad(index + 1)}</span>
       </span>
-      <span className="relative flex items-center justify-between">
-        <span className="grid size-12 place-items-center rounded-full bg-accent-soft text-accent transition-colors duration-300 group-hover:bg-accent group-hover:text-accent-ink">
-          <TreatmentIcon kind={item.scene} size={24} />
-        </span>
-        <span className="text-sm font-medium tabular-nums text-muted">{pad(index + 1)}</span>
-      </span>
-      <h3 className="relative mt-8 text-2xl font-semibold tracking-tight sm:mt-10">{item.name}</h3>
-      <p className="relative mb-6 mt-3 leading-relaxed text-muted">{item.short}</p>
-      <dl className="relative mt-auto grid grid-cols-2 gap-4 border-t border-line pt-5 text-sm">
+      <h3 className="mt-4 text-xl font-semibold tracking-tight sm:mt-6 sm:text-2xl">{item.name}</h3>
+      <p className="mb-4 mt-2 line-clamp-2 leading-relaxed text-muted sm:mb-5 sm:mt-3 sm:line-clamp-3">{item.short}</p>
+      <dl className="mt-auto grid grid-cols-2 gap-4 border-t border-line pt-5 text-sm">
         {item.facts.map((f) => (
           <div key={f.label}>
             <dt className="text-muted">{f.label}</dt>
@@ -177,7 +162,7 @@ function Card({ item, index }: { item: RailItem; index: number }) {
           </div>
         ))}
       </dl>
-      <span className="relative mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-accent">
+      <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-accent sm:mt-5">
         See how it works
         <ArrowRightIcon
           size={16}

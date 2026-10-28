@@ -99,8 +99,21 @@ function CredentialCard() {
       <BrandMark className="absolute -bottom-10 -right-8 size-56 opacity-[0.09]" />
 
       {doctor.photo && (
-        <div className="relative aspect-[4/3]">
-          <Image src={doctor.photo} alt={doctor.name} fill sizes="(min-width: 1024px) 40vw, 100vw" className="object-cover" />
+        // Head and shoulders, centred on his face; the card's edges crop the
+        // shoulders and the photo fades into the card.
+        <div className="relative h-72 overflow-hidden [mask-image:linear-gradient(to_top,transparent,#000_32%)] [transform:translateZ(24px)] sm:h-80">
+          <div
+            aria-hidden
+            className="absolute left-1/2 top-2 size-72 -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgb(255_255_255/0.24),transparent)]"
+          />
+          <Image
+            src={doctor.photo}
+            alt={doctor.name}
+            width={1352}
+            height={1608}
+            sizes="(min-width: 1024px) 540px, 112vw"
+            className="portrait absolute left-[-11.6%] top-6 w-[112%] max-w-none"
+          />
         </div>
       )}
 

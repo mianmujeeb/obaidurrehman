@@ -30,6 +30,8 @@
   --accent-strong: #08524f;
   --accent-ink: #f2fbfa;
   --accent-soft: #d3e9e7;
+  /* Kidney stones in illustrations, matching the 3D scenes. */
+  --stone: #c99a4b;
   --shadow: 186 30% 30%;
   color-scheme: light;
 
@@ -44,6 +46,7 @@
     --accent-strong: #8fe0d8;
     --accent-ink: #04211f;
     --accent-soft: #10302e;
+    --stone: #dcbf86;
     --shadow: 186 60% 2%;
     color-scheme: dark;
   }
@@ -121,6 +124,16 @@ body {
     0 24px 60px -28px hsl(var(--shadow) / 0.35);
 }
 
+/* Doctor portrait (transparent cut-out): a tinted shadow on light, a slightly
+   dimmed grade with a faint accent aura on dark. Fade the cropped edge with a
+   mask on a larger wrapper; a mask here would clip the shadow to the image box. */
+.portrait {
+  filter: drop-shadow(0 28px 32px hsl(var(--shadow) / 0.28));
+  @variant dark {
+    filter: brightness(0.93) contrast(1.06) drop-shadow(0 0 36px color-mix(in oklab, var(--accent) 18%, transparent));
+  }
+}
+
 /* Native <details> accordion with a height transition where supported. */
 .faq details::details-content {
   block-size: 0;
@@ -136,8 +149,8 @@ body {
   interpolate-size: allow-keywords;
 }
 
-/* Booking dialog: bottom sheet on phones, centred card from sm up. */
-.booking-sheet {
+/* Dialogs (booking, full reviews): bottom sheet on phones, centred card from sm up. */
+.sheet-dialog {
   width: 100%;
   max-width: 100%;
   margin: auto auto 0;
@@ -153,34 +166,34 @@ body {
     overlay 0.45s allow-discrete,
     display 0.45s allow-discrete;
 }
-.booking-sheet[open] {
+.sheet-dialog[open] {
   opacity: 1;
   transform: none;
 }
 @starting-style {
-  .booking-sheet[open] {
+  .sheet-dialog[open] {
     opacity: 0;
     transform: translateY(32px);
   }
 }
-.booking-sheet::backdrop {
+.sheet-dialog::backdrop {
   background: rgb(4 16 17 / 0);
   transition:
     background 0.3s ease,
     overlay 0.3s allow-discrete,
     display 0.3s allow-discrete;
 }
-.booking-sheet[open]::backdrop {
+.sheet-dialog[open]::backdrop {
   background: rgb(4 16 17 / 0.45);
   backdrop-filter: blur(4px);
 }
 @starting-style {
-  .booking-sheet[open]::backdrop {
+  .sheet-dialog[open]::backdrop {
     background: rgb(4 16 17 / 0);
   }
 }
 @media (min-width: 640px) {
-  .booking-sheet {
+  .sheet-dialog {
     max-width: 34rem;
     margin: auto;
     border-radius: 1.5rem;
@@ -304,8 +317,8 @@ html:has(dialog[open]) {
   .rise {
     animation: none;
   }
-  .booking-sheet,
-  .booking-sheet::backdrop {
+  .sheet-dialog,
+  .sheet-dialog::backdrop {
     transition: none;
   }
   ::view-transition-group(*),

@@ -1,11 +1,13 @@
 import { ArrowUpRightIcon, QuotesIcon, StarIcon } from "@phosphor-icons/react/ssr";
-import { links, ratings, reviews } from "@/lib/doctor";
+import { links, ratings, reviews, reviewSourceName } from "@/lib/doctor";
 import { cn } from "@/lib/utils";
 import { MoreLink } from "../more-link";
 import { CountUp, Reveal } from "../motion";
 
-/** Rating and patient quotes. `more` adds a link through to the reviews page. */
-export function Reviews({ more = false }: { more?: boolean }) {
+const featured = reviews.filter((r) => r.featured);
+
+/** Home page rating and a few patient quotes, linking to every review on /reviews. */
+export function Reviews() {
   return (
     <section id="reviews" className="border-y border-line bg-surface">
       <div className="mx-auto grid max-w-7xl gap-12 px-4 py-20 md:px-8 md:py-28 lg:grid-cols-12 lg:gap-16">
@@ -29,21 +31,21 @@ export function Reviews({ more = false }: { more?: boolean }) {
             reported being satisfied with their visit.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
-            {more && <MoreLink href="/reviews">Reviews and questions</MoreLink>}
+            <MoreLink href="/reviews#reviews">Read all reviews</MoreLink>
             <a
               href={links.oladoc}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent underline-offset-4 hover:underline"
             >
-              Read all reviews on Oladoc
+              {ratings.source} profile
               <ArrowUpRightIcon size={16} weight="bold" aria-hidden />
             </a>
           </div>
         </Reveal>
 
         <ul className="grid gap-4 lg:col-span-7">
-          {reviews.map((r, i) => (
+          {featured.map((r, i) => (
             <Reveal
               key={r.name}
               as="li"
@@ -56,11 +58,11 @@ export function Reviews({ more = false }: { more?: boolean }) {
             >
               <QuotesIcon size={28} weight="fill" className="text-accent" aria-hidden />
               <blockquote className="mt-4 text-xl font-medium leading-snug tracking-tight sm:text-2xl">
-                &ldquo;{r.quote}&rdquo;
+                &ldquo;{r.text}&rdquo;
               </blockquote>
               <p className="mt-5 text-sm">
                 <span className="font-semibold">{r.name}</span>
-                <span className="text-muted">, {r.via}</span>
+                <span className="text-muted">, verified patient, {reviewSourceName[r.source]}</span>
               </p>
             </Reveal>
           ))}

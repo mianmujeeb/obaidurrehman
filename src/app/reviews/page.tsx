@@ -6,7 +6,7 @@ import { PageFrame, PageHero } from "@/components/page-frame";
 import { FlowSection } from "@/components/scroll-flow";
 import { FinalCta } from "@/components/sections/closing";
 import { Faq, QuestionList } from "@/components/sections/faq";
-import { Reviews } from "@/components/sections/reviews";
+import { AllReviews } from "@/components/sections/all-reviews";
 import { TreatmentIcon } from "@/components/treatment-icon";
 import { doctor, faqs } from "@/lib/doctor";
 import { treatments } from "@/lib/treatments";
@@ -57,7 +57,7 @@ export default function ReviewsPage() {
       </PageHero>
 
       <FlowSection>
-        <Reviews />
+        <AllReviews />
       </FlowSection>
       <FlowSection>
         <Faq id="questions" title="General questions" />
